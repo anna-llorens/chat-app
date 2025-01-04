@@ -1,19 +1,12 @@
 
-import { Button, HStack } from '@chakra-ui/react'
 import './App.css'
+import LoginPage from './pages/login-page'
 
 function App() {
 
   return (
     <>
-      <div>
-        Hello world!
-        <HStack>
-          <Button>Click me</Button>
-          <Button>Click me</Button>
-        </HStack>
-      </div>
-
+      <LoginPage />
     </>
   )
 }
