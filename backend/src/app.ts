@@ -1,19 +1,18 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import prisma from "./prisma.js"
 import userRoutes from './routes/user-routes.js';
-
+import cors from "cors";
 
 dotenv.config();
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send("Hello World");
+  res.send("Server is running");
 });
 
 app.use('/users', userRoutes);

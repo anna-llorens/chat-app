@@ -1,23 +1,53 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
-  Button,
   Center,
   Input,
   Stack,
   Text,
   Heading,
 } from "@chakra-ui/react";
+import useLogin from "../hooks/use-login"; // Import the custom hook
+import { Toaster, toaster } from "@/components/ui/toaster"
+import { Button } from "@/components/ui/button"
 
 function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const { login, error, user, isLoading } = useLogin(); // Destructure useLogin
 
   const handleRegisterClick = () => {
     setIsRegistering(true);
   };
 
+  const handleLoginClick = async () => {
+    if (!email) {
+      toaster.create({
+        title: "Error",
+        description: "Email is required.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    const loggedInUser = await login(email);
+
+    if (loggedInUser) {
+      toaster.create({
+        title: "Success",
+        description: `Welcome back, ${loggedInUser.name}!`,
+        type: "success",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
+
     <Center minH="100vh" bg="gray.100">
+      <Toaster />
       <Box
         bg="white"
         p={8}
@@ -40,7 +70,8 @@ function LoginPage() {
               type="text"
               size="md"
               variant="outline"
-
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           )}
           <Input
@@ -48,9 +79,20 @@ function LoginPage() {
             type="email"
             size="md"
             variant="outline"
-
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <Button colorScheme="blue" size="md">
+          {error && (
+            <Text color="red.500" fontSize="sm">
+              {error}
+            </Text>
+          )}
+          <Button
+            colorScheme="blue"
+            size="md"
+            loading={isLoading}
+            onClick={handleLoginClick}
+          >
             LOGIN
           </Button>
           {!isRegistering && (
@@ -67,6 +109,12 @@ function LoginPage() {
                 REGISTER NEW USER
               </Button>
             </>
+          )}
+
+          {user && (
+            <Text color="green.500" fontSize="sm">
+              Logged in as: {user.name}
+            </Text>
           )}
         </Stack>
       </Box>
