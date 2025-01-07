@@ -1,14 +1,21 @@
-
-import './App.css'
-import LoginPage from './pages/login-page'
+import { useState, useEffect } from 'react';
+import './App.css';
+import ChatPage from './pages/chat-page';
+import LoginPage from './pages/login-page';
 
 function App() {
+  const [userID, setUserId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const storedUserID = localStorage.getItem('chat-app::userId');
+    setUserId(storedUserID || undefined);
+  }, []);
 
   return (
     <>
-      <LoginPage />
+      {!userID ? <LoginPage setUserId={setUserId} /> : <ChatPage />}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

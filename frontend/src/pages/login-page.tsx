@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Center,
@@ -6,46 +6,96 @@ import {
   Stack,
   Text,
   Heading,
-} from "@chakra-ui/react";
-import useLogin from "../hooks/use-login"; // Import the custom hook
-import { Toaster, toaster } from "@/components/ui/toaster"
-import { Button } from "@/components/ui/button"
+} from '@chakra-ui/react';
+import useLogin from '../hooks/use-login';
+import { Toaster, toaster } from '@/components/ui/toaster';
+import { Field } from '@/components/ui/field'
+import { Button } from '@/components/ui/button';
+import useCreateUser from '@/hooks/use-create-user';
 
-function LoginPage() {
+interface LoginPageProps {
+  setUserId: (id: string | undefined) => void;
+}
+
+
+const LoginPage: React.FC<LoginPageProps> = ({ setUserId }) => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const { login, error, user, isLoading } = useLogin(); // Destructure useLogin
+  const { login, isLoading } = useLogin();
+  const { createUser } = useCreateUser();
+  const [formData, setFormData] = useState({ email: "", name: "" });
+  const [formErrors, setFormErrors] = useState({ email: "", name: "" });
 
-  const handleRegisterClick = () => {
-    setIsRegistering(true);
+  const validateData = () => {
+    const errors = { email: "", name: "" };
+    setFormErrors(errors);
+    if (!formData.email) {
+      errors.email = "Email is required";
+    }
+    if (isRegistering && !formData.name) {
+      errors.name = "Name is required";
+    }
+    setFormErrors(errors);
+    return Object.values(errors).every((error) => !error);
   };
 
-  const handleLoginClick = async () => {
-    if (!email) {
+  const toggleIsRegistering = () => {
+    setIsRegistering(!isRegistering);
+    setFormData({
+      name: "",
+      email: "",
+    });
+    setFormErrors({ email: "", name: "" });
+  };
+
+  const onUserRegister = async () => {
+    if (!validateData()) {
+      return;
+    }
+    const { user, error } = await createUser(formData);
+    if (error) {
       toaster.create({
         title: "Error",
-        description: "Email is required.",
-        type: "error",
+        description: error,
+        type: 'error',
+        duration: 3000,
+      });
+    }
+    if (user) {
+      toaster.create({
+        title: 'Success',
+        description: `User created, ${user.name}`,
+        type: 'success',
+        duration: 3000,
+      });
+      setIsRegistering(false);
+      setFormData((prev) => ({
+        ...prev,
+        name: "",
+      }));
+    }
+  };
+
+
+  const handleLoginClick = async () => {
+    if (!validateData()) {
+      return;
+    }
+    const { data: user, error } = await login(formData.email);
+    if (error) {
+      toaster.create({
+        title: 'Network error',
+        description: error,
+        type: 'error',
         duration: 3000,
       });
       return;
     }
-
-    const loggedInUser = await login(email);
-
-    if (loggedInUser) {
-      toaster.create({
-        title: "Success",
-        description: `Welcome back, ${loggedInUser.name}!`,
-        type: "success",
-        duration: 3000,
-      });
+    if (user) {
+      setUserId(user?.id);
     }
   };
 
   return (
-
     <Center minH="100vh" bg="gray.100">
       <Toaster />
       <Box
@@ -65,38 +115,47 @@ function LoginPage() {
         </Text>
         <Stack spaceY={4}>
           {isRegistering && (
+            <Field invalid={!!formErrors.name} errorText={formErrors.name}>
+              <Input
+                placeholder="Full Name"
+                type="text"
+                size="md"
+                variant="outline"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  name: e.target.value
+                })
+                )}
+              />
+            </Field>
+
+          )}
+          <Field invalid={!!formErrors.email} errorText={formErrors.email}>
             <Input
-              placeholder="Full Name"
-              type="text"
+              placeholder="Email"
+              type="email"
               size="md"
               variant="outline"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                email: e.target.value
+              })
+              )}
             />
-          )}
-          <Input
-            placeholder="Email"
-            type="email"
-            size="md"
-            variant="outline"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {error && (
-            <Text color="red.500" fontSize="sm">
-              {error}
-            </Text>
-          )}
-          <Button
-            colorScheme="blue"
-            size="md"
-            loading={isLoading}
-            onClick={handleLoginClick}
-          >
-            LOGIN
-          </Button>
-          {!isRegistering && (
+          </Field>
+
+          {!isRegistering ? (
             <>
+              <Button
+                colorScheme="blue"
+                size="md"
+                loading={isLoading}
+                onClick={handleLoginClick}
+              >
+                LOGIN
+              </Button>
               <Text color="gray.500" fontSize="sm">
                 or
               </Text>
@@ -104,22 +163,34 @@ function LoginPage() {
                 colorScheme="blue"
                 size="md"
                 variant="outline"
-                onClick={handleRegisterClick}
+                onClick={toggleIsRegistering}
               >
                 REGISTER NEW USER
               </Button>
             </>
-          )}
-
-          {user && (
-            <Text color="green.500" fontSize="sm">
-              Logged in as: {user.name}
-            </Text>
-          )}
+          ) : <>
+            <Button
+              colorScheme="blue"
+              size="md"
+              loading={isLoading}
+              onClick={onUserRegister}
+            >
+              REGISTER
+            </Button>
+            <Button
+              colorScheme="blue"
+              size="md"
+              variant="outline"
+              onClick={toggleIsRegistering}
+            >
+              BACK TO LOGIN
+            </Button>
+          </>}
         </Stack>
       </Box>
     </Center>
   );
-}
+};
 
 export default LoginPage;
+

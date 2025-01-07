@@ -1,43 +1,31 @@
+import { api } from '@/api'; // Import the reusable Axios instance
 import { useState } from 'react';
+import { User } from '@/interfaces';
 
 interface LoginResponse {
   message: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    createdAt: string;
-  };
+  user?: User;
 }
 
 const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<LoginResponse['user'] | null>(null);
 
-  const login = async (email: string) => {
+  const login = async (email: string): Promise<{ data?: User; error?: string }> => {
     setIsLoading(true);
-    setError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await api.post<LoginResponse>('/users/login', { email });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+      const data = response.data;
+
+      if (data.user?.id) {
+        localStorage.setItem('chat-app::userId', data.user.id);
       }
-
-      const data: LoginResponse = await response.json();
-      setUser(data.user);
-      return data.user;
+      return { data: data.user }; // Return the user data
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      const errorMessage =
+        err.response?.data?.message || 'An unexpected error occurred';
+      return { error: errorMessage };
     } finally {
       setIsLoading(false);
     }
@@ -45,8 +33,6 @@ const useLogin = () => {
 
   return {
     isLoading,
-    error,
-    user,
     login,
   };
 };
