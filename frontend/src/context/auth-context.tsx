@@ -8,16 +8,16 @@ interface LoginResponse {
   user?: User;
 }
 
-interface UserContextType {
+interface AuthContextType {
   user?: User;
   isLoading: boolean;
   login: (email: string) => Promise<{ data?: User; error?: string }>;
   logout: () => void;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const storedUser = localStorage.getItem(LS_USER);
   const [user, setUser] = useState<User | undefined>(storedUser ? JSON.parse(storedUser) : undefined);
@@ -47,14 +47,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       {children}
-    </UserContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
-export const useUser = () => {
-  const context = useContext(UserContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useUser must be used within a UserProvider");
   }

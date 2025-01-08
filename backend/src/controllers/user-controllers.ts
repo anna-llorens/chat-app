@@ -17,7 +17,6 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
     if (error.message === "Invalid user data") {
       return res.status(400).json({ message: error.message });
     }
-
     if (error?.code === "P2002") {
       return res.status(409).json({ message: "Email already in use" });
     }
@@ -30,7 +29,6 @@ export const getUsers = async (_req: Request, res: Response) => {
     const users = await getUsersService();
     res.json(users);
   } catch (error: any) {
-
     res.status(500).json({ message: 'Failed to fetch users', error: error?.message });
   }
 };

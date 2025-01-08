@@ -1,10 +1,12 @@
 import { Box, HStack, Input, VStack, Text, IconButton } from "@chakra-ui/react";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Avatar } from "@/components/ui/avatar";
-import { useUser } from "@/context/user-context";
+import { useAuth } from "@/context/auth-context";
+import useUsers from "@/hooks/use-users";
 
 export const Sidebar = () => {
-  const { logout, user } = useUser();
+  const { logout, user } = useAuth();
+  const { users } = useUsers();
   return (
     <Box w="15%" bg="white" p={2} shadow="lg" h="100vh" position="relative" minW="260px">
       {/* User Info */}
@@ -24,59 +26,8 @@ export const Sidebar = () => {
       {/* Contacts */}
       <Box overflowY="auto" maxH="calc(100vh - 180px)">
         <VStack align="stretch" spaceY={4}>
-          {[
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-            "Paul Wilson",
-            "Ana Williams",
-            "Lisa Roy",
-            "Jamie Taylor",
-            "Jason Roy",
-            "Amy Frost",
-          ].map((name, idx) => (
-            <HStack key={idx} spaceX={3}>
+          {users?.length && users.map(({ name, id }) => (
+            <HStack key={id} spaceX={3}>
               <Avatar name={name} size="sm" />
               <Box>
                 <Text fontSize="sm" fontWeight="bold">

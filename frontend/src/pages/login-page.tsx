@@ -12,11 +12,11 @@ import { Toaster, toaster } from '@/components/ui/toaster';
 import { Field } from '@/components/ui/field'
 import { Button } from '@/components/ui/button';
 import useCreateUser from '@/hooks/use-create-user';
-import { useUser } from '@/context/user-context';
+import { useAuth } from '@/context/auth-context';
 
 const LoginPage: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const { login, isLoading } = useUser();
+  const { login, isLoading } = useAuth();
   const { createUser } = useCreateUser();
   const [formData, setFormData] = useState({ email: "", name: "" });
   const [formErrors, setFormErrors] = useState({ email: "", name: "" });

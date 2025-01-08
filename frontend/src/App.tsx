@@ -2,10 +2,10 @@
 import './App.css';
 import ChatPage from './pages/chat/chat-page';
 import LoginPage from './pages/login-page';
-import { useUser } from './context/user-context';
+import { useAuth } from './context/auth-context';
 
 function App() {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   return (
     <>
