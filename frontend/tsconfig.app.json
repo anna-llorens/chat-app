@@ -30,6 +30,7 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "src/context/user-context.tsx"
   ]
 }

@@ -1,0 +1,1 @@
+export const LS_USER = "chat-app::user";

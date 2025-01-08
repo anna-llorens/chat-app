@@ -7,20 +7,16 @@ import {
   Text,
   Heading,
 } from '@chakra-ui/react';
-import useLogin from '../hooks/use-login';
+
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { Field } from '@/components/ui/field'
 import { Button } from '@/components/ui/button';
 import useCreateUser from '@/hooks/use-create-user';
+import { useUser } from '@/context/user-context';
 
-interface LoginPageProps {
-  setUserId: (id: string | undefined) => void;
-}
-
-
-const LoginPage: React.FC<LoginPageProps> = ({ setUserId }) => {
+const LoginPage: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const { login, isLoading } = useLogin();
+  const { login, isLoading } = useUser();
   const { createUser } = useCreateUser();
   const [formData, setFormData] = useState({ email: "", name: "" });
   const [formErrors, setFormErrors] = useState({ email: "", name: "" });
@@ -89,9 +85,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setUserId }) => {
         duration: 3000,
       });
       return;
-    }
-    if (user) {
-      setUserId(user?.id);
     }
   };
 
