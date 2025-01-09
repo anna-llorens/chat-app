@@ -13,13 +13,14 @@ import { Field } from '@/components/ui/field'
 import { Button } from '@/components/ui/button';
 import useCreateUser from '@/hooks/use-create-user';
 import { useAuth } from '@/context/auth-context';
+import { LoginUser } from '@/interfaces';
 
 const LoginPage: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const { login, isLoading } = useAuth();
   const { createUser } = useCreateUser();
-  const [formData, setFormData] = useState({ email: "", name: "" });
-  const [formErrors, setFormErrors] = useState({ email: "", name: "" });
+  const [formData, setFormData] = useState<LoginUser>({ email: "", name: "" });
+  const [formErrors, setFormErrors] = useState<LoginUser>({ email: "", name: "" });
 
   const validateData = () => {
     const errors = { email: "", name: "" };
@@ -76,7 +77,7 @@ const LoginPage: React.FC = () => {
     if (!validateData()) {
       return;
     }
-    const { data: user, error } = await login(formData.email);
+    const { error } = await login(formData.email);
     if (error) {
       toaster.create({
         title: 'Network error',
@@ -84,7 +85,6 @@ const LoginPage: React.FC = () => {
         type: 'error',
         duration: 3000,
       });
-      return;
     }
   };
 

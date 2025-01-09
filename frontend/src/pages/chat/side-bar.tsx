@@ -11,7 +11,6 @@ export const Sidebar = () => {
   const { showUserDetails } = useChat()
   return (
     <Box w="15%" bg="white" p={2} shadow="lg" position="relative" minW="260px">
-      {/* User Info */}
       <HStack
         mb={4}
         spaceX={3}
@@ -31,9 +30,7 @@ export const Sidebar = () => {
           </Text>
         </Box>
       </HStack>
-      {/* Search */}
       <Input placeholder="Search Here..." mb={4} borderRadius="md" size="sm" />
-      {/* Contacts */}
       <Box overflowY="auto" maxH="calc(100vh - 200px)">
         <VStack align="stretch" spaceY={3}>
           {users?.length && users.map(({ name, id }) => (
@@ -53,10 +50,7 @@ export const Sidebar = () => {
             </HStack>
           ))}
         </VStack>
-
-
       </Box>
-
       <IconButton
         colorPalette="red"
         size="sm"
@@ -64,13 +58,10 @@ export const Sidebar = () => {
         position="absolute"
         bottom={1}
         w="95%"
-
       >
         <IoLogOutOutline />
         Logout
       </IconButton>
-
-
     </Box>
   );
 };

@@ -1,14 +1,14 @@
 import { api } from '@/api';
-import { LoginUser } from '@/interfaces';
+import { User } from '@/interfaces';
 import { useState, useCallback } from 'react';
 
-const useCreateUser = () => {
+export const useUpdateUser = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const createUser = useCallback(async (user: LoginUser) => {
+  const updateUser = useCallback(async (userId: string, updates: Partial<User>) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/users', { user });
+      const response = await api.put(`/users/${userId}`, { user: updates });
       return { user: response.data, error: null };
     } catch (err: any) {
       return {
@@ -22,9 +22,8 @@ const useCreateUser = () => {
 
   return {
     isLoading,
-    createUser,
+    updateUser,
   };
 };
 
 
-export default useCreateUser;

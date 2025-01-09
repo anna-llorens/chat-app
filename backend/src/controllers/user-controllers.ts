@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { createUserService, deleteUserService, getUsersService, loginUserService } from '../services/user-services.js';
-
+import { createUserService, deleteUserService, editUserService, getUsersService, loginUserService } from '../services/user-services.js';
 
 export const createUser = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -29,11 +28,12 @@ export const getUsers = async (_req: Request, res: Response) => {
     const users = await getUsersService();
     res.json(users);
   } catch (error: any) {
+    console.log(new Date(), error)
     res.status(500).json({ message: 'Failed to fetch users', error: error?.message });
   }
 };
 
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
+export const loginUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email } = req.body;
     const user = await loginUserService(email);
@@ -55,19 +55,35 @@ export const deleteUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
     if (!id) {
+      console.log("Invalid user id")
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
     const deletedUser = await deleteUserService(id);
     if (!deletedUser) {
+      console.log(new Date(), "User not found")
       return res.status(404).json({ message: "User not found" });
     }
     console.log(new Date(), "User deleted", id);
-    res.status(200).json({ message: "User deleted successfully", id });
+    res.status(200).json({ message: "User deleted successfully" });
 
   } catch (error: any) {
     console.log(new Date(), error);
-    res.status(500).json({ message: error?.message || "Failed to delete user", type: "Network error" });
+    res.status(500).json({ message: "Failed to delete user", type: "Network error" });
   }
 };
 
+export const editUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { user } = req.body;
+    const updatedUser = await editUserService(user, id);
+    console.log(new Date(), "User updated", updatedUser);
+    res.status(200).json(updatedUser);
+  }
+  catch (error: any) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to update user" })
+  }
+
+};

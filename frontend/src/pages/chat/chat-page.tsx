@@ -11,8 +11,6 @@ const ChatPage = () => {
         <Sidebar />
         <ChatArea />
         <UserDetailsInfo
-          onDelete={() => { }}
-          onSave={(data) => console.log(data)}
         />
       </Box>
     </ChatProvider>

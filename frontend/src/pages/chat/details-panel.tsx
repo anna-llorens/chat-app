@@ -13,21 +13,19 @@ import { useChat } from "@/context/chat-context";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
+import { useDeleteUser } from "@/hooks/use-delete-user";
+import { toaster, Toaster } from "@/components/ui/toaster";
+import { useUpdateUser } from "@/hooks/use-update-user";
 
-interface UserDetailsProps {
-  onDelete: () => void;
-  onSave: (updatedDetails: { name: string; email: string; avatarUrl?: string }) => void;
-}
-
-const UserDetailsInfo: React.FC<UserDetailsProps> = ({
-  onDelete,
-  onSave,
+const UserDetailsInfo: React.FC = ({
 }) => {
   const { isDetailsVisible, setDetailsPanel, selectedUser } = useChat();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedEmail, setEditedEmail] = useState("");
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { deleteUser } = useDeleteUser()
+  const { updateUser } = useUpdateUser();
 
   useEffect(() => {
     if (selectedUser) {
@@ -42,10 +40,46 @@ const UserDetailsInfo: React.FC<UserDetailsProps> = ({
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    onSave({ name: editedName, email: editedEmail });
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (selectedUser) {
+      const { user, error } = await updateUser(selectedUser.id, { name: editedName, email: editedEmail });
+      if (user) {
+        toaster.create({
+          description: "User updated successfully",
+          type: 'success',
+          duration: 3000,
+        });
+        setIsEditing(false);
+      }
+      if (error) {
+        toaster.create({
+          title: 'Network error',
+          description: error,
+          type: 'error',
+          duration: 3000,
+        });
+      }
+    }
   };
+
+  const onUserDelete = async () => {
+    if (selectedUser) {
+      const { success, error } = await deleteUser(String(selectedUser.id));
+      if (success) {
+        logout();
+      }
+      if (error) {
+        if (error) {
+          toaster.create({
+            title: 'Network error',
+            description: error,
+            type: 'error',
+            duration: 3000,
+          });
+        }
+      }
+    }
+  }
 
   return isDetailsVisible && selectedUser ? (
     <Box
@@ -133,10 +167,11 @@ const UserDetailsInfo: React.FC<UserDetailsProps> = ({
 
       </VStack>
       {selectedUser.id === user?.id ? < VStack align="stretch">
-        <Button colorPalette="red" onClick={onDelete} mt={20}>
+        <Button colorPalette="red" onClick={onUserDelete} mt={20} size="xs">
           Delete Account
         </Button>
       </VStack> : null}
+      <Toaster />
     </Box >
   ) : null;
 };

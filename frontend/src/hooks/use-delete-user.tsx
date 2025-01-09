@@ -1,18 +1,17 @@
 import { api } from '@/api';
-import { LoginUser } from '@/interfaces';
 import { useState, useCallback } from 'react';
 
-const useCreateUser = () => {
+export const useDeleteUser = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const createUser = useCallback(async (user: LoginUser) => {
+  const deleteUser = useCallback(async (userId: string) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/users', { user });
-      return { user: response.data, error: null };
+      await api.delete(`/users/${userId}`);
+      return { success: true, error: null };
     } catch (err: any) {
       return {
-        user: null,
+        success: false,
         error: err.response?.data?.message || 'Something went wrong',
       };
     } finally {
@@ -22,9 +21,7 @@ const useCreateUser = () => {
 
   return {
     isLoading,
-    createUser,
+    deleteUser,
   };
 };
 
-
-export default useCreateUser;
