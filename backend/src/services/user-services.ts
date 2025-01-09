@@ -1,7 +1,6 @@
 import prisma from '../prisma.js';
 
 export const createUserService = async (data: { name: string; email: string }) => {
-
   return prisma.user.create({ data });
 };
 
@@ -14,3 +13,10 @@ export const loginUserService = async (email: string) => {
     where: { email },
   });
 };
+
+export const deleteUserService = async (id: string): Promise<any> => {
+  return await prisma.user.delete({
+    where: { id },
+  });
+};
+
