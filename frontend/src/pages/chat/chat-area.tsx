@@ -5,7 +5,7 @@ import { FiSearch, FiStar } from "react-icons/fi"
 
 export const ChatArea = () => {
 
-  return <Box w="85%" bg="white" p={4} h="100vh" display="flex" flexDirection="column">
+  return <Box w="85%" bg="white" p={4} display="flex" flexDirection="column" shadow="lg">
     {/* Chat Header */}
     <HStack mb={4} justify="space-between">
       <HStack spaceX={3}>
