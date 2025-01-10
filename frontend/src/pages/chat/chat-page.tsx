@@ -7,7 +7,7 @@ import { ChatProvider } from '@/context/chat-context';
 const ChatPage = () => {
   return (
     <ChatProvider>
-      <Box bg="gray.100" display="flex" h="calc(100vh - 4px)" p={2} spaceX={4}>
+      <Box bg="gray.100" display="flex" h="calc(100vh - 4px)" p={2} spaceX={3}>
         <Sidebar />
         <ChatArea />
         <UserDetailsInfo

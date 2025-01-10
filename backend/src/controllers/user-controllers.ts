@@ -19,7 +19,7 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
     if (error?.code === "P2002") {
       return res.status(409).json({ message: "Email already in use" });
     }
-    res.status(500).json({ message: error?.message || "Failed to fetch", type: 'Network error' });
+    res.status(500).json({ message: error?.message || "Failed to fetch" });
   }
 };
 

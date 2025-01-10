@@ -3,7 +3,6 @@ import {
   Box,
   VStack,
   Text,
-
   IconButton,
   Input,
   HStack,
@@ -12,72 +11,84 @@ import { RxCross2 } from "react-icons/rx";
 import { useChat } from "@/context/chat-context";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/auth-context";
-import { useDeleteUser } from "@/hooks/use-delete-user";
+
+import { useDeleteUser } from "@/hooks/user/use-delete-user";
 import { toaster, Toaster } from "@/components/ui/toaster";
-import { useUpdateUser } from "@/hooks/use-update-user";
+import { useUpdateUser } from "@/hooks/user/use-update-user";
+import { LS_USER } from "@/constants";
+import { useQuery } from "@tanstack/react-query";
+import { AppError, User } from "@/interfaces";
+import { useAuth } from "@/hooks/user/use-Auth";
 
 const UserDetailsInfo: React.FC = ({
 }) => {
-  const { isDetailsVisible, setDetailsPanel, selectedUser } = useChat();
+  const { isDetailsVisible, setDetailsVisible } = useChat();
+  const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
+  const authUser = useAuth();
+  const deleteUser = useDeleteUser();
+  const updateUser = useUpdateUser();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState("");
-  const [editedEmail, setEditedEmail] = useState("");
-  const { user, logout } = useAuth();
-  const { deleteUser } = useDeleteUser()
-  const { updateUser } = useUpdateUser();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (selectedUser) {
-      setEditedEmail(selectedUser.email);
-      setEditedName(selectedUser.name);
+      setEmail(selectedUser.email);
+      setName(selectedUser.name);
     }
     setIsEditing(false);
   }, [selectedUser]);
 
+  const resetFormValues = () => {
+    if (selectedUser) {
+      setIsEditing(false);
+      setEmail(selectedUser.email);
+      setName(selectedUser.name);
+    }
+  }
+
   const onClose = () => {
-    setDetailsPanel(false);
-    setIsEditing(false);
+    setDetailsVisible(false);
+    resetFormValues();
   };
 
-  const handleSave = async () => {
+  const onSave = async () => {
     if (selectedUser) {
-      const { user, error } = await updateUser(selectedUser.id, { name: editedName, email: editedEmail });
-      if (user) {
-        toaster.create({
-          description: "User updated successfully",
-          type: 'success',
-          duration: 3000,
+      updateUser.mutate({ userId: selectedUser.id, user: { name, email } },
+        {
+          onSuccess: (user) => {
+            toaster.create({
+              description: "User updated successfully",
+              type: 'success',
+              duration: 3000,
+            });
+            setIsEditing(false);
+            localStorage.setItem(LS_USER, JSON.stringify(user));
+          },
+          onError: (error: AppError) => {
+            toaster.create({
+              title: 'Network error',
+              description: error.response?.data?.message,
+              type: 'error',
+              duration: 3000,
+            });
+          },
         });
-        setIsEditing(false);
-      }
-      if (error) {
-        toaster.create({
-          title: 'Network error',
-          description: error,
-          type: 'error',
-          duration: 3000,
-        });
-      }
     }
   };
 
   const onUserDelete = async () => {
     if (selectedUser) {
-      const { success, error } = await deleteUser(String(selectedUser.id));
-      if (success) {
-        logout();
-      }
-      if (error) {
-        if (error) {
+      deleteUser.mutate(selectedUser.id), {
+        onError: (error: AppError) => {
           toaster.create({
             title: 'Network error',
-            description: error,
+            description: error.response.data.message,
             type: 'error',
             duration: 3000,
           });
         }
-      }
+      };
     }
   }
 
@@ -85,10 +96,11 @@ const UserDetailsInfo: React.FC = ({
     <Box
       w="400px"
       bg="white"
-      p={6}
       shadow="lg"
       borderRadius="md"
       position="relative"
+      p={4} m={2}
+
     >
       <IconButton
         aria-label="Close"
@@ -114,13 +126,13 @@ const UserDetailsInfo: React.FC = ({
           <VStack spaceY={1} align="stretch">
             <Input
               placeholder="Name"
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <Input
               placeholder="Email"
-              value={editedEmail}
-              onChange={(e) => setEditedEmail(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </VStack>
         ) : (
@@ -137,27 +149,21 @@ const UserDetailsInfo: React.FC = ({
         <Text fontSize="sm" color="gray.500">
           Joined: {new Date(String(selectedUser.createdAt)).toLocaleDateString()}
         </Text>
-
-        {/* Action Buttons */}
         <HStack spaceX={1} mt={4}>
           {isEditing ? (
             <>
               <Button
                 size="xs"
                 variant="outline"
-                onClick={() => {
-                  setEditedName(selectedUser.name);
-                  setEditedEmail(selectedUser.email);
-                  setIsEditing(false);
-                }}
+                onClick={resetFormValues}
               >
                 Cancel
               </Button>
-              <Button colorPalette="cyan" onClick={handleSave} size="xs">
+              <Button colorPalette="cyan" onClick={onSave} size="xs">
                 Save
               </Button>
             </>
-          ) : (selectedUser.id === user?.id &&
+          ) : (selectedUser.id === authUser?.id &&
             <Button variant="outline" onClick={() => setIsEditing(true)} size="xs">
               Edit
             </Button>
@@ -166,7 +172,7 @@ const UserDetailsInfo: React.FC = ({
         </HStack>
 
       </VStack>
-      {selectedUser.id === user?.id ? < VStack align="stretch">
+      {selectedUser.id === authUser?.id ? < VStack align="stretch">
         <Button colorPalette="red" onClick={onUserDelete} mt={20} size="xs">
           Delete Account
         </Button>

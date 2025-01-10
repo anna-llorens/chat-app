@@ -11,14 +11,15 @@ import {
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { Field } from '@/components/ui/field'
 import { Button } from '@/components/ui/button';
-import useCreateUser from '@/hooks/use-create-user';
-import { useAuth } from '@/context/auth-context';
-import { LoginUser } from '@/interfaces';
+import useCreateUser from '@/hooks/user/use-create-user';
+
+import { AppError, LoginUser } from '@/interfaces';
+import { useLogin } from '@/hooks/user/use-login';
 
 const LoginPage: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
-  const { login, isLoading } = useAuth();
-  const { createUser } = useCreateUser();
+  const login = useLogin();
+  const createUser = useCreateUser();
   const [formData, setFormData] = useState<LoginUser>({ email: "", name: "" });
   const [formErrors, setFormErrors] = useState<LoginUser>({ email: "", name: "" });
 
@@ -48,44 +49,45 @@ const LoginPage: React.FC = () => {
     if (!validateData()) {
       return;
     }
-    const { user, error } = await createUser(formData);
-    if (error) {
-      toaster.create({
-        title: "Error",
-        description: error,
-        type: 'error',
-        duration: 3000,
-      });
-    }
-    if (user) {
-      toaster.create({
-        title: 'Success',
-        description: `User created, ${user.name}`,
-        type: 'success',
-        duration: 3000,
-      });
-      setIsRegistering(false);
-      setFormData((prev) => ({
-        ...prev,
-        name: "",
-      }));
-    }
+    createUser.mutate({ name: formData.name, email: formData.email }, {
+      onError: (error: AppError) => {
+        toaster.create({
+          title: "Error",
+          description: error?.response?.data.message || "An unexpected error occurred",
+          type: 'error',
+          duration: 3000,
+        });
+      },
+      onSuccess: (user) => {
+        toaster.create({
+          title: 'Success',
+          description: `User created, ${user?.name}`,
+          type: 'success',
+          duration: 3000,
+        });
+        setIsRegistering(false);
+        setFormData((prev) => ({
+          ...prev,
+          name: "",
+        }));
+      }
+    })
   };
-
 
   const handleLoginClick = async () => {
     if (!validateData()) {
       return;
     }
-    const { error } = await login(formData.email);
-    if (error) {
-      toaster.create({
-        title: 'Network error',
-        description: error,
-        type: 'error',
-        duration: 3000,
-      });
-    }
+    login.mutate({ email: formData.email }, {
+      onError: (error: AppError) => {
+        toaster.create({
+          title: 'Network error',
+          description: error?.response?.data.message || "An unexpected error occurred",
+          type: 'error',
+          duration: 3000,
+        });
+      },
+    });
   };
 
   return (
@@ -144,7 +146,7 @@ const LoginPage: React.FC = () => {
               <Button
                 colorScheme="blue"
                 size="md"
-                loading={isLoading}
+                // loading={isLoading}
                 onClick={handleLoginClick}
               >
                 LOGIN
@@ -165,7 +167,7 @@ const LoginPage: React.FC = () => {
             <Button
               colorScheme="blue"
               size="md"
-              loading={isLoading}
+              // loading={isLoading}
               onClick={onUserRegister}
             >
               REGISTER

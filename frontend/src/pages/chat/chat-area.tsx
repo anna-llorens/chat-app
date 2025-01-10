@@ -1,17 +1,34 @@
 import { Avatar } from "@/components/ui/avatar"
+import { useChat } from "@/context/chat-context";
+import { User } from "@/interfaces";
 import { Box, HStack, Badge, VStack, Input, Button, Text } from "@chakra-ui/react"
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 import { FiSearch, FiStar } from "react-icons/fi"
 
 export const ChatArea = () => {
+  const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
+  const queryClient = useQueryClient();
+  const { setDetailsVisible } = useChat();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  return <Box w="85%" bg="white" p={4} display="flex" flexDirection="column" shadow="lg">
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView();
+  }, []);
+
+  const showUserDetails = () => {
+    queryClient.setQueryData(["selectedUser"], selectedUser);
+    setDetailsVisible(true);
+  }
+
+  return <Box w="80%" bg="white" p={4} m={2} display="flex" flexDirection="column" shadow="lg" borderRadius="8px">
     {/* Chat Header */}
     <HStack mb={4} justify="space-between">
-      <HStack spaceX={3}>
-        <Avatar name="Dianne Jhonson" size="sm" />
+      <HStack spaceX={3} cursor="pointer" onClick={showUserDetails}>
+        <Avatar name={selectedUser?.name} size="sm" bg="blue.200"></Avatar>
         <Text fontSize="lg" fontWeight="bold">
-          Dianne Jhonson
+          {selectedUser?.name}
         </Text>
         <Badge colorScheme="green">Online</Badge>
       </HStack>
@@ -78,6 +95,7 @@ export const ChatArea = () => {
           <Text fontSize="sm">Ya. I'll be adding more team members to it.</Text>
         </Box>
       </VStack>
+      <div ref={messagesEndRef} />
     </Box>
 
     {/* Message Input */}
@@ -85,5 +103,5 @@ export const ChatArea = () => {
       <Input placeholder="Write something..." flex="1" borderRadius="md" />
       <Button colorScheme="blue">Send</Button>
     </HStack>
-  </Box>
+  </Box >
 }
