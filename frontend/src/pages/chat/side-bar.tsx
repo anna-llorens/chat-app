@@ -1,4 +1,4 @@
-import { Box, HStack, Input, VStack, Text, IconButton } from "@chakra-ui/react";
+import { Box, HStack, Input, VStack, Text, IconButton, Float, Circle } from "@chakra-ui/react";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Avatar } from "@/components/ui/avatar";
 import useUsers from "@/hooks/user/use-users";
@@ -9,12 +9,14 @@ import { LS_USER } from "@/constants";
 import { User } from "@/interfaces";
 import { useAuth } from "@/hooks/user/use-Auth";
 import { disconnectSocket } from "@/socket";
+import useOnlineStatus from "@/hooks/chat/use-online-status";
 
 export const Sidebar = () => {
   const { users } = useUsers();
   const { setDetailsVisible } = useChat();
   const queryClient = useQueryClient();
   const authUser = useAuth();
+  const { onlineUsers } = useOnlineStatus();
   const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
 
   const logout = () => {
@@ -59,6 +61,7 @@ export const Sidebar = () => {
       <VStack align="stretch" overflowY="auto" maxH="calc(100vh - 235px)" cursor="pointer" p={2}>
         {users?.length && users.map((user) => {
           const isSelected = selectedUser?.id === user.id;
+          const isOnline = onlineUsers.includes(String(user.id));
           return (
             <HStack
               key={user.id}
@@ -68,13 +71,21 @@ export const Sidebar = () => {
               borderRadius="8px"
               bg={isSelected ? "gray.200" : "transparent"}
               _hover={{
-                bg: isSelected ? "gray.200" : "gray.100",
                 cursor: "pointer",
                 borderRadius: "8px"
               }}
               w="100%"
             >
-              <Avatar name={user.name} size="xs" bg="blue.200" />
+              <Avatar name={user.name} size="xs" bg="blue.200" >
+                <Float placement="bottom-end" offsetX="1" offsetY="1">
+                  <Circle
+                    bg={isOnline ? "green.500" : "gray.500"}
+                    size="10px"
+                    outline="0.2em solid"
+                    outlineColor={isSelected ? "gray.200" : "bg"}
+                  />
+                </Float>
+              </Avatar>
               <Box flex="1">
                 <Text fontSize="sm" fontWeight="bold" truncate>
                   {user.name}

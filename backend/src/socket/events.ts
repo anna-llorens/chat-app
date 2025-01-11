@@ -39,5 +39,7 @@ export const setupSocketHandlers = (io: any, socket: any) => {
   socket.on('disconnect', (reason: DisconnectReason) => {
     const userId = socket.handshake.query.userId;
     console.log(new Date(), 'User diconnected id:', userId, reason);
+    onlineUsers.delete(userId);
+    io.emit("userOffline", userId);
   });
 }

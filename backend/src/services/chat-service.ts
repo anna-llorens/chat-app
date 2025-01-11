@@ -3,16 +3,16 @@ const prisma = new PrismaClient();
 
 /**
  * Handles adding a message to the database.
- * @param data - The message data including content, senderId, chatId, and selectedUserId.
+ * @param data - The message data including content, senderId, chatId, and contactId.
  * @returns The saved message.
  */
 export const addMessage = async (data: {
   content: string;
   senderId: string;
   chatId: string;
-  selectedUserId: string;
+  contactId: string;
 }) => {
-  const { content, senderId, chatId, selectedUserId } = data;
+  const { content, senderId, chatId, contactId } = data;
   try {
     // Check if the chat exists
     let chat = await prisma.chat.findUnique({
@@ -27,7 +27,7 @@ export const addMessage = async (data: {
           users: {
             create: [
               { user: { connect: { id: senderId } } },
-              { user: { connect: { id: selectedUserId } } },
+              { user: { connect: { id: contactId } } },
             ],
           },
         },
@@ -60,7 +60,6 @@ export async function getChatHistory(chatId: string) {
       where: { chatId },
       orderBy: { createdAt: "asc" },
     });
-
     return history;
   } catch (error) {
     console.error(`Error retrieving chat history for chatId: ${chatId}`, error);
