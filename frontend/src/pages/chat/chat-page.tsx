@@ -8,8 +8,7 @@ import { useAuth } from '@/hooks/user/use-Auth';
 import { User } from '@/interfaces';
 
 const ChatPage = () => {
-  const authUser = useAuth() as User;
-  connectSocket(authUser.id);
+  connectSocket((useAuth() as User).id);
 
   return (
     <ChatProvider>

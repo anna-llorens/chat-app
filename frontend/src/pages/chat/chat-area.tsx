@@ -6,6 +6,7 @@ import { socket } from "@/socket";
 import { Box, HStack, Badge, VStack, Input, Button, Text } from "@chakra-ui/react"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { generateChatId } from "@/helpers.js"
 
 import { FiSearch, FiStar } from "react-icons/fi"
 
@@ -17,35 +18,31 @@ export const ChatArea = () => {
   const [input, setInput] = useState("");
   const authUser = useAuth() as User;
   const [messages, setMessages] = useState<Message[]>([]);
-  const room = selectedUser ? [authUser.id, selectedUser.id].sort().join("_").concat("_room") : null;
-
-
-
+  const chatId = generateChatId(selectedUser?.id, authUser.id);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
-    if (room) {
-      socket?.emit("join", { room, senderId: authUser?.id });
+    if (chatId) {
+      socket?.emit("join", chatId);
       setMessages([]);
-
-      // socket?.on("history", (history: Message[]) => {
-      //   setMessages(history.map((msg: Message) => msg));
-      // });
-
+      socket?.on("history", (history: Message[]) => {
+        setMessages(history.map((msg: Message) => msg));
+      });
       socket?.on("newMessage", (message) => {
-        if (room === message.room) {
+        console.log(message)
+        if (chatId === message.chatId) {
           setMessages((prev) => [...prev, message]);
         }
       });
     }
-
     return () => {
       socket?.off("history");
       socket?.off("message");
+      socket?.off("newMessage")
     };
-  }, [room, authUser?.id]);
+  }, [chatId, authUser?.id]);
 
 
 
@@ -56,8 +53,12 @@ export const ChatArea = () => {
 
   const sendMessage = () => {
     if (input.trim()) {
-      const time = new Date().toLocaleTimeString();
-      const message = { content: input, senderId: authUser?.id, time, room };
+      const message = {
+        content: input,
+        senderId: authUser?.id,
+        chatId,
+        selectedUserId: selectedUser?.id,
+      };
       socket?.emit("message", message);
       setInput("");
     }
@@ -80,9 +81,9 @@ export const ChatArea = () => {
 
     <Box flex="1" overflowY="auto" mb={4}>
       <VStack align="stretch" spaceY={4}>
-        {messages.map((message) => (
+        {messages.map((message, idx) => (
           <Box
-            key={message.time}
+            key={idx}
             alignSelf={message.senderId === authUser.id ? 'flex-end' : 'flex-start'}
             bg={message.senderId === authUser.id ? 'blue.200' : 'blue.50'}
             p={3}
@@ -90,7 +91,7 @@ export const ChatArea = () => {
           >
             <Text fontSize="sm">{message.content}</Text>
             <Text fontSize="xs" color="gray.500" mt={1}>
-              {message.time}
+              {new Date(message?.createdAt)?.toLocaleTimeString()}
             </Text>
           </Box>
         ))}

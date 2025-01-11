@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createUserService, deleteUserService, editUserService, getUsersService, loginUserService } from '../services/user-services.js';
+import { createUserService, deleteUserService, editUserService, getUsersService, loginUserService } from '../services/user-service.js';
 
 export const createUser = async (req: Request, res: Response): Promise<any> => {
   try {

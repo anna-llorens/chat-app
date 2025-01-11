@@ -31,6 +31,7 @@
   },
   "include": [
     "src",
-    "src/context/auth-context.tsx"
+    "src/context/auth-context.tsx",
+    "../backend/src/helpers.ts"
   ]
 }

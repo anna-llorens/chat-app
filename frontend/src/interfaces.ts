@@ -16,6 +16,7 @@ export interface Message {
   senderId: string;
   time: string;
   chatId: string;
+  createdAt: Date;
 }
 
 interface ApiErrorResponse {
