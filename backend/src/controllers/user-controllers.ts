@@ -16,7 +16,7 @@ export const createUser = async (req: Request, res: Response): Promise<any> => {
     if (error.message === "Invalid user data") {
       return res.status(400).json({ message: error.message });
     }
-    if (error?.code === "P2002") {
+    if (error?.code === "P2002") { // Prisma error type
       return res.status(409).json({ message: "Email already in use" });
     }
     res.status(500).json({ message: error?.message || "Failed to fetch" });
@@ -42,7 +42,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       console.log(new Date(), "User account not found:", email)
     }
     else {
-      console.log(new Date(), "Login user:", email)
+      console.log(new Date(), "Login user:", user.id)
       res.status(200).json({ message: 'Login successful', user });
     }
   } catch (error) {

@@ -34,7 +34,7 @@ The application will be available at http://localhost:5173
 
 ## 🌐 Technologies Used
 
-### 💻 Frontend
+### Frontend
 
 - React: Component-based UI framework
 
@@ -52,7 +52,9 @@ The application will be available at http://localhost:5173
 
 - TanStack Query (React Query): Data-fetching and state management library for server-state caching, synchronization, and updates.
 
-### 🐞 Backend
+- socket.io-client
+
+### Backend
 
 - Express: Node.js web application framework
 
@@ -63,6 +65,8 @@ The application will be available at http://localhost:5173
 - Cors: Middleware for Cross-Origin Resource Sharing
 
 - Dotenv: Environment variable management
+
+- socket.io
 
   ```
 

@@ -10,6 +10,14 @@ export interface User extends LoginUser {
   createdAt?: string;
 }
 
+export interface Message {
+  id: number;
+  content: string;
+  senderId: string;
+  time: string;
+  chatId: string;
+}
+
 interface ApiErrorResponse {
   message: string;
 }

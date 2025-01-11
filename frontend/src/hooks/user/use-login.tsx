@@ -3,6 +3,7 @@ import { AppError } from "@/interfaces";
 import { LS_USER } from "@/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+
 export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation<any, AppError, { email: string }>({
@@ -14,6 +15,7 @@ export const useLogin = () => {
       if (user?.id) {
         localStorage.setItem(LS_USER, JSON.stringify(user));
         queryClient.setQueryData(['authUser'], user);
+
       }
     },
   });

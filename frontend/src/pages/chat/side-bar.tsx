@@ -8,6 +8,7 @@ import { LS_USER } from "@/constants";
 
 import { User } from "@/interfaces";
 import { useAuth } from "@/hooks/user/use-Auth";
+import { disconnectSocket } from "@/socket";
 
 export const Sidebar = () => {
   const { users } = useUsers();
@@ -19,6 +20,7 @@ export const Sidebar = () => {
   const logout = () => {
     localStorage.removeItem(LS_USER);
     queryClient.setQueryData(["authUser"], null);
+    disconnectSocket();
   };
 
   const showUserDetails = (user: User) => {
@@ -64,17 +66,16 @@ export const Sidebar = () => {
               p={1}
               onClick={() => onUserSelect(user)}
               borderRadius="8px"
-
               bg={isSelected ? "gray.200" : "transparent"}
               _hover={{
                 bg: isSelected ? "gray.200" : "gray.100",
                 cursor: "pointer",
                 borderRadius: "8px"
               }}
-              w="100%" // Ensure it stretches the full width of the container
+              w="100%"
             >
               <Avatar name={user.name} size="xs" bg="blue.200" />
-              <Box flex="1"> {/* Makes this Box take available space */}
+              <Box flex="1">
                 <Text fontSize="sm" fontWeight="bold" truncate>
                   {user.name}
                 </Text>
