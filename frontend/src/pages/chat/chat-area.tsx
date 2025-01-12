@@ -69,7 +69,7 @@ export const ChatArea = () => {
     }
   };
 
-  return <Box w="80%" bg="white" p={4} m={2} display="flex" flexDirection="column" shadow="lg" borderRadius="8px">
+  return <Box w="80%" bg="white" p={4} mx={2} display="flex" flexDirection="column" shadow="lg" borderRadius="8px">
     <HStack mb={4} justify="space-between">
       <HStack spaceX={3} cursor="pointer" onClick={showUserDetails}>
         <Avatar name={selectedUser?.name} size="xs" bg="blue.200" >

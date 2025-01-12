@@ -99,7 +99,7 @@ const UserDetailsInfo: React.FC = ({
       shadow="lg"
       borderRadius="md"
       position="relative"
-      p={4} m={2}
+      p={4} mx={2}
 
     >
       <IconButton

@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
               <Button
                 colorScheme="blue"
                 size="md"
-                // loading={isLoading}
+                loading={login.isPending}
                 onClick={handleLoginClick}
               >
                 LOGIN

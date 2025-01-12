@@ -12,7 +12,7 @@ const ChatPage = () => {
 
   return (
     <ChatProvider>
-      <Box bg="gray.100" display="flex" h="calc(100vh - 4px)" p={2} spaceX={3}>
+      <Box bg="gray.100" display="flex" h="100vh" px={2} spaceX={3} p={1}>
         <Sidebar />
         <ChatArea />
         <UserDetailsInfo />
