@@ -25,7 +25,7 @@ const useRecentChats = (userId: string) => {
     isLoading,
     recentChats: recentChats || null,
     error: error?.response?.data?.message || null,
-    refetchRecentChats: refetch
+    refetchRecentChats: refetch,
   };
 };
 
