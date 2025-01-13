@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { createUserService, deleteUserService, editUserService, getUsersService, loginUserService } from '../services/user-service.js';
+import { getRecentChats } from '../services/chat-service.js';
 
 export const createUser = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -86,4 +87,17 @@ export const editUser = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "Failed to update user" })
   }
 
+};
+
+export const recentChats = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params; // Assuming `userId` is provided in the route parameters
+    const chats = await getRecentChats(id);
+
+    console.log(new Date(), "Recent chats fetched", { id, chatCount: chats.length });
+    res.status(200).json(chats);
+  } catch (error: any) {
+    console.error(new Date(), "Error fetching recent chats", error);
+    res.status(500).json({ message: "Failed to fetch recent chats" });
+  }
 };

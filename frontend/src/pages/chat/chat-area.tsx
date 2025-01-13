@@ -11,6 +11,7 @@ import { formatMessageDate, generateChatId } from "@/helpers"
 import { FiSearch, FiStar } from "react-icons/fi"
 import useOnlineStatus from "@/hooks/chat/use-online-status";
 import React from "react";
+import useRecentChats from "@/hooks/chat/use-recent-chats";
 
 export const ChatArea = () => {
   const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
@@ -23,6 +24,7 @@ export const ChatArea = () => {
   const { onlineUsers } = useOnlineStatus();
   const isOnline = onlineUsers.includes(String(selectedUser?.id));
   const chatId = generateChatId(selectedUser?.id, authUser.id);
+  const { refetchRecentChats } = useRecentChats(authUser.id)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
@@ -39,6 +41,7 @@ export const ChatArea = () => {
         console.log(message)
         if (chatId === message.chatId) {
           setMessages((prev) => [...prev, message]);
+          refetchRecentChats();
         }
       });
     }
@@ -106,7 +109,7 @@ export const ChatArea = () => {
               {showDateSeparator && (
                 <Box alignSelf="center" my={2}>
                   <Text fontSize="xs" color="gray.500">
-                    {formatMessageDate(messageDate)}
+                    {formatMessageDate(messageDate, true)}
                   </Text>
                 </Box>
               )}

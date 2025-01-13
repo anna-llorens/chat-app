@@ -1,16 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api";
 import { User } from "@/interfaces";
+import { useAuth } from "./use-Auth";
 
-const fetchUsers = async (): Promise<User[]> => {
+const fetchUsers = async (authUserId?: string): Promise<User[]> => {
   const response = await api.get("/users");
-  return response.data;
+  const users: User[] = response.data;
+  return users.filter(user => user.id !== authUserId);
 };
 
 const useUsers = () => {
+  const authUser = useAuth();
   const { data: users, isLoading, error } = useQuery<User[], any>({
     queryKey: ["users"],
-    queryFn: fetchUsers,
+    queryFn: () => fetchUsers(authUser?.id),
   });
 
   return {

@@ -3,10 +3,13 @@ import { IoClose } from "react-icons/io5";
 import { useMemo, useState } from "react";
 import useUsers from "@/hooks/user/use-users";
 import { UserComponent } from "./user";
+import useOnlineStatus from "@/hooks/chat/use-online-status";
 
 export const ContactsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { users } = useUsers();
+  const { onlineUsers } = useOnlineStatus();
+
   const filteredUsers = useMemo(() => {
     return users?.filter((user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -38,10 +41,13 @@ export const ContactsList = () => {
         </IconButton>
       )}
     </HStack>
-    <VStack align="stretch" p={2} className="anna">
+    <VStack align="stretch" p={2} cursor="pointer">
       {filteredUsers?.length ? (
-        filteredUsers.map((user) =>
-          <UserComponent user={user} key={user.id} />)
+        filteredUsers.map((user) => {
+          const isOnline = onlineUsers.includes(String(user?.id));
+          return <UserComponent user={user} key={user.id} isOnline={isOnline} />
+        }
+        )
       ) : (
         <Text fontSize="sm" color="gray.500" textAlign="center">
           No users found.

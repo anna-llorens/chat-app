@@ -66,3 +66,52 @@ export async function getChatHistory(chatId: string) {
     throw new Error("Failed to retrieve chat history.");
   }
 }
+
+export const getRecentChats = async (userId: string) => {
+  try {
+    // Fetch the latest 10 chats for the user
+    const recentChats = await prisma.chat.findMany({
+      where: {
+        users: {
+          some: {
+            userId,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      take: 10,
+      include: {
+        users: {
+          include: {
+            user: true, // Include user details if needed
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1, // Include the latest message for each chat
+        },
+      },
+    });
+
+    // Transform the data to include only the required fields
+    const formattedChats = recentChats.map(chat => {
+      const receiver = chat.users.find(user => user.userId !== userId)?.user;
+      const lastMessage = chat.messages[0];
+      return {
+        user: receiver,
+        lastMessage: lastMessage?.content,
+        createdAt: lastMessage?.createdAt,
+        chatId: chat.id,
+      };
+    });
+
+    return formattedChats;
+  } catch (error) {
+    console.error('Error fetching recent chats:', error);
+    throw new Error('Unable to fetch recent chats');
+  }
+};
