@@ -18,7 +18,6 @@ export const useDeleteUser = () => {
       localStorage.removeItem(LS_USER);
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.setQueryData(["authUser"], null);
-      queryClient.setQueryData(["selectedUser"], null);
     }
   });
 };

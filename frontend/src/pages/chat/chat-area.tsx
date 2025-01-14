@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/user/use-Auth";
 import { Message, User } from "@/interfaces";
 import { socket } from "@/socket";
 import { Box, HStack, VStack, Input, Button, Text, Float, Circle } from "@chakra-ui/react"
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { formatMessageDate, generateChatId } from "@/helpers"
 
@@ -14,9 +13,7 @@ import React from "react";
 import useRecentChats from "@/hooks/chat/use-recent-chats";
 
 export const ChatArea = () => {
-  const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
-  const queryClient = useQueryClient();
-  const { setDetailsVisible } = useChat();
+  const { selectedUser, setDetailsInfo } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const authUser = useAuth() as User;
@@ -54,8 +51,7 @@ export const ChatArea = () => {
 
 
   const showUserDetails = () => {
-    queryClient.setQueryData(["selectedUser"], selectedUser);
-    setDetailsVisible(true);
+    setDetailsInfo(selectedUser);
   }
 
   const sendMessage = () => {

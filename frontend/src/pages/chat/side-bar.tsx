@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/accordion";
 
 export const Sidebar = () => {
-  const { setDetailsVisible } = useChat();
+  const { setDetailsInfo } = useChat();
   const queryClient = useQueryClient();
   const authUser = useAuth();
 
@@ -31,10 +31,9 @@ export const Sidebar = () => {
 
   const showUserDetails = useCallback(
     (user: User) => {
-      queryClient.setQueryData(["selectedUser"], user);
-      setDetailsVisible(true);
+      setDetailsInfo(user);
     },
-    [queryClient, setDetailsVisible]
+    [queryClient, setDetailsInfo]
   );
 
   return (

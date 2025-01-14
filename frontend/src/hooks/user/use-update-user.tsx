@@ -16,7 +16,6 @@ export const useUpdateUser = () => {
     },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(["authUser"], updatedUser);
-      queryClient.setQueryData(["selectedUser"], updatedUser);
       queryClient.invalidateQueries({ queryKey: ["users"] });
     }
   });

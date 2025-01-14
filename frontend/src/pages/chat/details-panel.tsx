@@ -16,14 +16,12 @@ import { useDeleteUser } from "@/hooks/user/use-delete-user";
 import { toaster, Toaster } from "@/components/ui/toaster";
 import { useUpdateUser } from "@/hooks/user/use-update-user";
 import { LS_USER } from "@/constants";
-import { useQuery } from "@tanstack/react-query";
-import { AppError, User } from "@/interfaces";
+import { AppError } from "@/interfaces";
 import { useAuth } from "@/hooks/user/use-Auth";
 
 const UserDetailsInfo: React.FC = ({
 }) => {
-  const { isDetailsVisible, setDetailsVisible } = useChat();
-  const { data: selectedUser } = useQuery<User>({ queryKey: ["selectedUser"] });
+  const { selectedUser, setDetailsInfo, detailsUser } = useChat();
   const authUser = useAuth();
   const deleteUser = useDeleteUser();
   const updateUser = useUpdateUser();
@@ -32,23 +30,23 @@ const UserDetailsInfo: React.FC = ({
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    if (selectedUser) {
-      setEmail(selectedUser.email);
-      setName(selectedUser.name);
+    if (detailsUser) {
+      setEmail(detailsUser.email);
+      setName(detailsUser.name);
     }
     setIsEditing(false);
-  }, [selectedUser]);
+  }, [detailsUser]);
 
   const resetFormValues = () => {
-    if (selectedUser) {
+    if (detailsUser) {
       setIsEditing(false);
-      setEmail(selectedUser.email);
-      setName(selectedUser.name);
+      setEmail(detailsUser.email);
+      setName(detailsUser.name);
     }
   }
 
   const onClose = () => {
-    setDetailsVisible(false);
+    setDetailsInfo(null);
     resetFormValues();
   };
 
@@ -92,7 +90,7 @@ const UserDetailsInfo: React.FC = ({
     }
   }
 
-  return isDetailsVisible && selectedUser ? (
+  return detailsUser ? (
     <Box
       w="400px"
       bg="white"
@@ -119,7 +117,7 @@ const UserDetailsInfo: React.FC = ({
 
       <VStack spaceY={2} align={isEditing ? "stretch" : "center"} mt={8}>
         {!isEditing && (
-          <Avatar size="2xl" name={selectedUser.name} bg="blue.200" />
+          <Avatar size="2xl" name={detailsUser.name} bg="blue.200" />
         )}
 
         {isEditing ? (
@@ -138,16 +136,16 @@ const UserDetailsInfo: React.FC = ({
         ) : (
           <VStack spaceY={1} align="center">
             <Text fontSize="xl" fontWeight="bold">
-              {selectedUser.name}
+              {detailsUser.name}
             </Text>
             <Text fontSize="md" color="gray.600">
-              {selectedUser.email}
+              {detailsUser.email}
             </Text>
           </VStack>
         )}
 
         <Text fontSize="sm" color="gray.500">
-          Joined: {new Date(String(selectedUser.createdAt)).toLocaleDateString()}
+          Joined: {new Date(String(detailsUser.createdAt)).toLocaleDateString()}
         </Text>
         <HStack spaceX={1} mt={4}>
           {isEditing ? (
@@ -163,7 +161,7 @@ const UserDetailsInfo: React.FC = ({
                 Save
               </Button>
             </>
-          ) : (selectedUser.id === authUser?.id &&
+          ) : (detailsUser.id === authUser?.id &&
             <Button variant="outline" onClick={() => setIsEditing(true)} size="xs">
               Edit
             </Button>
@@ -172,7 +170,7 @@ const UserDetailsInfo: React.FC = ({
         </HStack>
 
       </VStack>
-      {selectedUser.id === authUser?.id ? < VStack align="stretch">
+      {detailsUser.id === authUser?.id ? < VStack align="stretch">
         <Button colorPalette="red" onClick={onUserDelete} mt={20} size="xs">
           Delete Account
         </Button>
