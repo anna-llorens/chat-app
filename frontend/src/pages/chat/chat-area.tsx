@@ -3,17 +3,18 @@ import { useChat } from "@/context/chat-context";
 import { useAuth } from "@/hooks/user/use-Auth";
 import { Message, User } from "@/interfaces";
 import { socket } from "@/socket";
-import { Box, HStack, VStack, Input, Button, Text, Float, Circle } from "@chakra-ui/react"
+import { Box, HStack, VStack, Input, Button, Text, Float, Circle, useMediaQuery, IconButton } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react";
 import { formatMessageDate, generateChatId } from "@/helpers"
 
 import { FiSearch, FiStar } from "react-icons/fi"
+import { IoIosArrowBack } from "react-icons/io";
 import useOnlineStatus from "@/hooks/chat/use-online-status";
 import React from "react";
 import useRecentChats from "@/hooks/chat/use-recent-chats";
 
 export const ChatArea = () => {
-  const { selectedUser, setDetailsInfo } = useChat();
+  const { selectedUser, setDetailsInfo, setSelectedUser } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const authUser = useAuth() as User;
@@ -21,7 +22,9 @@ export const ChatArea = () => {
   const { onlineUsers } = useOnlineStatus();
   const isOnline = onlineUsers.includes(String(selectedUser?.id));
   const chatId = generateChatId(selectedUser?.id, authUser?.id);
-  const { refetchRecentChats } = useRecentChats(authUser?.id)
+  const { refetchRecentChats } = useRecentChats(authUser?.id);
+  const [isSmallScreen] = useMediaQuery(['(max-width: 768px)'], { ssr: false });
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
@@ -48,7 +51,10 @@ export const ChatArea = () => {
     };
   }, [chatId, authUser?.id]);
 
-
+  const onBack = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
+    setSelectedUser(null);
+  }
 
   const showUserDetails = () => {
     setDetailsInfo(selectedUser);
@@ -67,9 +73,20 @@ export const ChatArea = () => {
     }
   };
 
-  return <Box w="80%" bg="white" p={4} mx={2} display="flex" flexDirection="column" shadow="lg" borderRadius="8px">
+  return <Box w={{ base: "100%", md: "80%" }} bg="white" p={4} mx={{ base: 0, md: 2 }
+  } display="flex" flexDirection="column" shadow="lg" borderRadius="8px" >
     <HStack mb={4} justify="space-between">
       <HStack spaceX={3} cursor="pointer" onClick={showUserDetails}>
+        {isSmallScreen && (
+          <IconButton
+            aria-label="Back"
+            onClick={(e) => onBack(e)}
+            size="sm"
+            variant="ghost"
+          >
+            <IoIosArrowBack />
+          </IconButton>
+        )}
         <Avatar name={selectedUser?.name} size="xs" bg="blue.200" >
           <Float placement="bottom-end" offsetX="1" offsetY="1">
             <Circle

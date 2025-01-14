@@ -1,11 +1,11 @@
 import { useCallback } from "react";
-import { Box, HStack, Text, IconButton } from "@chakra-ui/react";
+import { Box, HStack, Text, IconButton, Float, Circle } from "@chakra-ui/react";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Avatar } from "@/components/ui/avatar";
 import { useChat } from "@/context/chat-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { LS_USER } from "@/constants";
-
+import { MdOutlineModeEdit } from "react-icons/md";
 import { User } from "@/interfaces";
 import { useAuth } from "@/hooks/user/use-Auth";
 import { disconnectSocket } from "@/socket";
@@ -39,27 +39,44 @@ export const Sidebar = () => {
   );
 
   return (
-    <Box w="20%" bg="white" p={1} shadow="lg" position="relative" minW="260px" borderRadius="md">
+    <Box w={{ base: "100%", md: "20%" }} bg="white" shadow="lg" position="relative" minW="260px" borderRadius="md">
       <HStack
-        mb={4}
-        spaceX={3}
-        onClick={() => showUserDetails(authUser as User)}
-        cursor="pointer"
-        p={2}
+        mb={2}
+        spaceX={4}
         bg="gray.300"
-        borderRadius="md"
+        align="center"
+        p={4}
       >
-        <Avatar name={authUser?.name} size="md" bg="blue.300" />
-        <Box>
-          <Text fontSize="md" fontWeight="bold">
-            {authUser?.name}
+        <Avatar name={authUser?.name} size="lg" bg="purple.300">
+          <Float placement="bottom-end" offsetX="1" offsetY="1">
+            <Circle
+              bg={"green.500"}
+              size="12px"
+              outline="0.2em solid"
+              outlineColor={"gray.300"}
+            />
+          </Float>
+        </Avatar>
+        <Box flex="1">
+          <Text fontSize="lg" fontWeight="bold" color="gray.800">
+            {authUser?.name || "User Name"}
           </Text>
-          <Text fontSize="sm" color="gray.500">
-            {authUser?.email}
+          <Text fontSize="sm" color="gray.600">
+            {authUser?.email || "user@example.com"}
           </Text>
         </Box>
+        {/* Edit Icon Button */}
+        <IconButton
+          aria-label="Edit user details"
+          size="md"
+          onClick={() => showUserDetails(authUser as User)} // Trigger edit action
+          variant="ghost"
+          _hover={{ bg: "gray.300" }}
+        >
+          <MdOutlineModeEdit />
+        </IconButton>
       </HStack>
-      <AccordionRoot multiple defaultValue={["recent-chats", "contacts"]}>
+      <AccordionRoot multiple defaultValue={["recent-chats", "contacts"]} p={1}>
         <AccordionItem value="recent-chats">
           <AccordionItemTrigger>
             <span>Recent Chats</span>
@@ -89,6 +106,6 @@ export const Sidebar = () => {
         <IoLogOutOutline />
         Logout
       </IconButton>
-    </Box>
+    </Box >
   );
 };

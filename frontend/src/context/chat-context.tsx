@@ -1,6 +1,7 @@
 import useRecentChats from "@/hooks/chat/use-recent-chats";
 import { useAuth } from "@/hooks/user/use-Auth";
 import { User } from "@/interfaces";
+import { useMediaQuery } from "@chakra-ui/react";
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 
 interface ChatContextType {
@@ -18,12 +19,13 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const authUser = useAuth();
   const { recentChats } = useRecentChats(authUser ? authUser.id : "");
 
+  const [isSmallScreen] = useMediaQuery(["(max-width: 768px)"], { ssr: false });
   useEffect(() => {
-    if (!selectedUser && recentChats) {
+    // Preselect a user only if it's not a small screen
+    if (!isSmallScreen && !selectedUser && recentChats && recentChats.length > 0) {
       setSelectedUser(recentChats[0].user);
     }
-  }, [recentChats, selectedUser]);
-
+  }, [recentChats, selectedUser, isSmallScreen, setSelectedUser]);
   return (
     <ChatContext.Provider value={{ selectedUser, setSelectedUser, setDetailsInfo, detailsUser }}>
       {children}

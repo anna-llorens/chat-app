@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useAuth } from './hooks/user/use-Auth.tsx';
 import ChatPage from './pages/chat/chat-page';
 import LoginPage from './pages/login-page';
+import { ChatProvider } from './context/chat-context.tsx';
 
 const queryClient = new QueryClient();
 const App = () => useAuth()?.id ? <ChatPage /> : <LoginPage />;
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <Provider>
-        <App />
+        <ChatProvider>
+          <App />
+        </ChatProvider>
       </Provider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

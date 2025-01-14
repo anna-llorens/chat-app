@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/user/use-Auth";
 
 const UserDetailsInfo: React.FC = ({
 }) => {
-  const { selectedUser, setDetailsInfo, detailsUser } = useChat();
+  const { setDetailsInfo, detailsUser } = useChat();
   const authUser = useAuth();
   const deleteUser = useDeleteUser();
   const updateUser = useUpdateUser();
@@ -51,8 +51,8 @@ const UserDetailsInfo: React.FC = ({
   };
 
   const onSave = async () => {
-    if (selectedUser) {
-      updateUser.mutate({ userId: selectedUser.id, user: { name, email } },
+    if (detailsUser) {
+      updateUser.mutate({ userId: detailsUser.id, user: { name, email } },
         {
           onSuccess: (user) => {
             toaster.create({
@@ -76,8 +76,8 @@ const UserDetailsInfo: React.FC = ({
   };
 
   const onUserDelete = async () => {
-    if (selectedUser) {
-      deleteUser.mutate(selectedUser.id), {
+    if (detailsUser) {
+      deleteUser.mutate(detailsUser.id), {
         onError: (error: AppError) => {
           toaster.create({
             title: 'Network error',
@@ -92,12 +92,12 @@ const UserDetailsInfo: React.FC = ({
 
   return detailsUser ? (
     <Box
-      w="400px"
+      w={{ base: "100%", md: "400px" }}
       bg="white"
       shadow="lg"
       borderRadius="md"
       position="relative"
-      p={4} mx={2}
+      p={4} mx={{ base: 0, md: 2 }}
 
     >
       <IconButton
@@ -117,7 +117,7 @@ const UserDetailsInfo: React.FC = ({
 
       <VStack spaceY={2} align={isEditing ? "stretch" : "center"} mt={8}>
         {!isEditing && (
-          <Avatar size="2xl" name={detailsUser.name} bg="blue.200" />
+          <Avatar size="2xl" name={detailsUser.name} bg="purple.200" />
         )}
 
         {isEditing ? (
