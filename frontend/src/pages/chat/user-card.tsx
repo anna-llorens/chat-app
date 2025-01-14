@@ -1,39 +1,36 @@
-import { HStack, Box, Text, Circle, Float, Badge, VStack } from "@chakra-ui/react";
+import { HStack, Box, Text, Circle, Float, Badge } from "@chakra-ui/react";
 import { Avatar } from "@/components/ui/avatar";
 import { User } from "@/interfaces";
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useChat } from "@/context/chat-context";
 import { formatMessageDate } from "@/helpers";
 import { useMarkAsRead } from "@/hooks/chat/use-mark-as-read";
 
-type UserComponentProps = {
+type UserCardProps = {
   user: User;
+  isOnline: boolean;
   lastUpdated?: string;
   lastMessage?: string;
-  isOnline: boolean;
   chatId?: string;
-  unreadCount?: number
+  notificationCount?: number
 }
 
-export const UserComponent: React.FC<UserComponentProps> = ({ user, lastUpdated, lastMessage, isOnline, unreadCount, chatId }) => {
-  const queryClient = useQueryClient();
+export const UserCard: React.FC<UserCardProps> = ({ user, lastUpdated, lastMessage, isOnline, notificationCount, chatId }) => {
   const { setSelectedUser, selectedUser, setDetailsInfo } = useChat();
   const isSelected = selectedUser?.id === user?.id;
-  const markAsRead = useMarkAsRead()
+  const markAsRead = useMarkAsRead();
+  const isCurrentChat = selectedUser?.id === user?.id;
 
   const onUserSelect = useCallback(
     (user: User) => {
       setSelectedUser(user);
       setDetailsInfo(null);
       if (chatId) {
-        markAsRead.mutate({ userId: user?.id as string, chatId });
+        markAsRead.mutate({ userId: user?.id, chatId });
       }
     },
-    [queryClient, setDetailsInfo, setDetailsInfo]
+    [setDetailsInfo, setDetailsInfo]
   );
-
-
 
   return (
     <HStack
@@ -68,9 +65,9 @@ export const UserComponent: React.FC<UserComponentProps> = ({ user, lastUpdated,
       </Box>
 
       {/* Notification Counter */}
-      {unreadCount ? (
+      {!isCurrentChat && notificationCount ? (
         <Badge colorPalette="red" borderRadius="full" px={2} size="xs">
-          {unreadCount}
+          {notificationCount}
         </Badge>
       ) : lastUpdated ? (
         <Text fontSize="xs" color="gray.400" truncate>

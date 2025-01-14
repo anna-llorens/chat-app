@@ -1,14 +1,19 @@
 
 import useOnlineStatus from "@/hooks/chat/use-online-status";
-import { UserComponent } from "./user"
+import { UserCard } from "./user-card"
 import useRecentChats from "@/hooks/chat/use-recent-chats";
 import { useAuth } from "@/hooks/user/use-Auth";
 import { Skeleton, VStack } from "@chakra-ui/react";
+import { useChat } from "@/context/chat-context";
+import { socket } from "@/socket";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const RecentChats = () => {
   const authUser = useAuth();
   const { recentChats, isLoading, error } = useRecentChats(authUser?.id as string);
+  const { selectedUser } = useChat();
   const { onlineUsers } = useOnlineStatus();
+  const queryClient = useQueryClient();
 
   if (isLoading) {
     return <VStack spaceY={1}>
@@ -26,14 +31,19 @@ export const RecentChats = () => {
       {recentChats && recentChats.length > 0 ? (
         recentChats.map(({ user, lastUpdated, lastMessage, chatId, notificationCount }) => {
           const isOnline = onlineUsers.includes(String(user?.id));
+          const isCurrentChat = selectedUser?.id === user?.id;
+          if (isCurrentChat && notificationCount > 0) {
+            socket?.emit("markAsRead", { userId: authUser?.id, chatId });
+            queryClient.invalidateQueries({ queryKey: ["recentChats", authUser?.id] })
+          }
           return (
-            <UserComponent
+            <UserCard
               user={user}
+              isOnline={isOnline}
               key={chatId}
               lastUpdated={lastUpdated}
               lastMessage={lastMessage}
-              isOnline={isOnline}
-              unreadCount={notificationCount}
+              notificationCount={!isCurrentChat ? notificationCount : 0}
               chatId={chatId}
             />
           );

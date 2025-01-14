@@ -2,7 +2,7 @@ import { HStack, Input, VStack, Text, IconButton, Skeleton } from "@chakra-ui/re
 import { IoClose } from "react-icons/io5";
 import { useMemo, useState } from "react";
 import useUsers from "@/hooks/user/use-users";
-import { UserComponent } from "./user";
+import { UserCard } from "./user-card";
 import useOnlineStatus from "@/hooks/chat/use-online-status";
 
 export const ContactsList = () => {
@@ -56,7 +56,7 @@ export const ContactsList = () => {
       {filteredUsers?.length ? (
         filteredUsers.map((user) => {
           const isOnline = onlineUsers.includes(String(user?.id));
-          return <UserComponent user={user} key={user.id} isOnline={isOnline} />
+          return <UserCard user={user} key={user.id} isOnline={isOnline} />
         }
         )
       ) : (

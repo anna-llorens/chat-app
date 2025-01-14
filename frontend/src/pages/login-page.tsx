@@ -132,6 +132,7 @@ const LoginPage: React.FC = () => {
               type="email"
               size="md"
               variant="outline"
+              onKeyUp={(e) => e.key === "Enter" && handleLoginClick()}
               value={formData.email}
               onChange={(e) => setFormData(prev => ({
                 ...prev,
@@ -183,7 +184,7 @@ const LoginPage: React.FC = () => {
           </>}
         </Stack>
       </Box>
-    </Center>
+    </Center >
   );
 };
 

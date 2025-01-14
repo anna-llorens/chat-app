@@ -20,8 +20,8 @@ export const ChatArea = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const { onlineUsers } = useOnlineStatus();
   const isOnline = onlineUsers.includes(String(selectedUser?.id));
-  const chatId = generateChatId(selectedUser?.id, authUser.id);
-  const { refetchRecentChats } = useRecentChats(authUser.id)
+  const chatId = generateChatId(selectedUser?.id, authUser?.id);
+  const { refetchRecentChats } = useRecentChats(authUser?.id)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
@@ -109,8 +109,8 @@ export const ChatArea = () => {
                 </Box>
               )}
               <Box
-                alignSelf={message.senderId === authUser.id ? 'flex-end' : 'flex-start'}
-                bg={message.senderId === authUser.id ? 'blue.200' : 'blue.50'}
+                alignSelf={message.senderId === authUser?.id ? 'flex-end' : 'flex-start'}
+                bg={message.senderId === authUser?.id ? 'blue.200' : 'blue.50'}
                 p={3}
                 borderRadius="lg"
               >

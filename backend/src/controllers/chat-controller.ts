@@ -6,7 +6,6 @@ export const recentChats = async (req: Request, res: Response): Promise<void> =>
   try {
     const { id } = req.params;
     const chats = await getRecentChats(id);
-    console.log(new Date(), "Recent chats fetched", { id });
     res.status(200).json(chats);
   } catch (error: any) {
     console.error(new Date(), "Error fetching recent chats", error);

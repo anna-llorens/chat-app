@@ -1,5 +1,5 @@
 import { DisconnectReason } from "socket.io";
-import { addMessage, getChatHistory } from "../services/chat-service.js";
+import { addMessage, getChatHistory, notificationReadService } from "../services/chat-service.js";
 
 const onlineUsers = new Set();
 
@@ -34,6 +34,14 @@ export const setupSocketHandlers = (io: any, socket: any) => {
     } catch (error) {
       console.error(new Date(), "Error handling message:", error);
       socket.emit("errorMessage", { error: "Failed to process message." });
+    }
+  })
+
+  socket.on("markAsRead", async (data: any) => {
+    try {
+      await notificationReadService(data.userId, data.chatId)
+    } catch (error) {
+      console.error(new Date(), "Error removing user notification message:", error);
     }
   })
 

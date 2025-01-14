@@ -19,13 +19,15 @@ import {
 } from "@/components/ui/accordion";
 
 export const Sidebar = () => {
-  const { setDetailsInfo } = useChat();
+  const { setDetailsInfo, setSelectedUser } = useChat();
   const queryClient = useQueryClient();
   const authUser = useAuth();
 
   const logout = useCallback(() => {
     localStorage.removeItem(LS_USER);
     queryClient.setQueryData(["authUser"], null);
+    setSelectedUser(null);
+
     disconnectSocket();
   }, [queryClient]);
 
