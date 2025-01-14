@@ -5,7 +5,8 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user-routes.js';
 import cors from "cors";
 import { setupSocketHandlers } from './socket/events.js';
-import { addMessage, getChatHistory } from './services/chat-service.js';
+import { markNotificationAsRead } from './controllers/chat-controller.js';
+
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/users', userRoutes);
+app.put('/notifications/mark-read', markNotificationAsRead);
 
 app.get('/', (_req, res) => {
   res.send("Server is running");

@@ -38,10 +38,9 @@ export const ChatArea = () => {
         setMessages(history.map((msg: Message) => msg));
       });
       socket?.on("newMessage", (message) => {
-        console.log(message)
         if (chatId === message.chatId) {
           setMessages((prev) => [...prev, message]);
-          refetchRecentChats();
+          refetchRecentChats(); // Updates user recentChats
         }
       });
     }

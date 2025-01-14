@@ -14,6 +14,7 @@ model User {
   createdAt DateTime @default(now())
   chats     UserChat[]
   messages  Message[] @relation("UserMessages")
+  notifications Notification[]
 }
 
 model Chat {
@@ -22,6 +23,7 @@ model Chat {
   updatedAt DateTime @updatedAt
   users     UserChat[]
   messages  Message[] @relation("ChatMessages")
+  notifications Notification[]
 }
 
 model UserChat {
@@ -41,4 +43,17 @@ model Message {
   sender    User     @relation("UserMessages", fields: [senderId], references: [id])
   chat      Chat     @relation("ChatMessages", fields: [chatId], references: [id])
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  chatId      String    @db.ObjectId
+  count       Int       @default(0)
+  user        User      @relation(fields: [userId], references: [id])
+  chat        Chat      @relation(fields: [chatId], references: [id])
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+
+    @@unique([userId, chatId], name: "userId_chatId")
 }

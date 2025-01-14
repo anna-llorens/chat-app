@@ -29,7 +29,8 @@ export const setupSocketHandlers = (io: any, socket: any) => {
   socket.on("message", async (data: any) => {
     try {
       const message = await addMessage(data);
-      io.to(data.chatId).emit("newMessage", message);
+      io.to(data.chatId).emit("newMessage", message)
+      io.emit("newNotification", data?.contactId);
     } catch (error) {
       console.error(new Date(), "Error handling message:", error);
       socket.emit("errorMessage", { error: "Failed to process message." });

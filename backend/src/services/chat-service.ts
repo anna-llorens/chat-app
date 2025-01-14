@@ -41,6 +41,25 @@ export const addMessage = async (data: {
         chat: { connect: { id: chatId } },
       },
     });
+
+    await prisma.notification.upsert({
+      where: {
+        userId_chatId: {
+          userId: contactId,
+          chatId,
+        },
+      },
+      update: {
+        count: { increment: 1 },
+        updatedAt: new Date(),
+      },
+      create: {
+        userId: contactId,
+        chatId,
+        count: 1,
+      },
+    });
+
     return message;
   } catch (error) {
     console.error("Error saving message:", error);
@@ -69,7 +88,7 @@ export async function getChatHistory(chatId: string) {
 
 export const getRecentChats = async (userId: string) => {
   try {
-    // Fetch the latest 10 chats for the user
+    // Fetch chats for the user with necessary relations
     const recentChats = await prisma.chat.findMany({
       where: {
         users: {
@@ -78,10 +97,6 @@ export const getRecentChats = async (userId: string) => {
           },
         },
       },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-      take: 10,
       include: {
         users: {
           include: {
@@ -94,20 +109,31 @@ export const getRecentChats = async (userId: string) => {
           },
           take: 1, // Include the latest message for each chat
         },
+        notifications: {
+          where: {
+            userId
+          }
+        }
       },
     });
 
     // Transform the data to include only the required fields
     const formattedChats = recentChats.map(chat => {
       const receiver = chat.users.find(user => user.userId !== userId)?.user;
-      const lastMessage = chat.messages[0];
+      const lastMessage = chat?.messages[0];
+      const notification = chat?.notifications[0]; // There should only be one notification per user per chat
+
       return {
         user: receiver,
         lastMessage: lastMessage?.content,
-        createdAt: lastMessage?.createdAt,
+        lastUpdated: lastMessage?.createdAt || chat.updatedAt, // Use the latest message date or chat updatedAt
         chatId: chat.id,
+        notificationCount: notification?.count || 0, // Default to 0 if no notifications exist
       };
     });
+
+    // Sort chats by the latest activity (lastUpdated field)
+    formattedChats.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
 
     return formattedChats;
   } catch (error) {
@@ -115,3 +141,26 @@ export const getRecentChats = async (userId: string) => {
     throw new Error('Unable to fetch recent chats');
   }
 };
+
+
+
+export const notificationReadService = async (userId: string, chatId: string) => {
+  try {
+    await prisma.notification.updateMany({
+      where: {
+        userId,
+        chatId,
+      },
+      data: {
+        count: 0,
+      },
+    });
+    return { success: true, message: "Notification marked as read." };
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    throw new Error('Unable to mark notification as read.');
+  }
+};
+
+
+

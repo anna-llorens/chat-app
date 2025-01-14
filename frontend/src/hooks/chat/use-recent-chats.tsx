@@ -1,12 +1,15 @@
 import { api } from "@/api";
 import { User } from "@/interfaces";
+import { socket } from "@/socket";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 interface RecentChat {
   chatId: string;
-  lastMessage: string;
+  lastUpdated: string;
   user: User;
-  createdAt: string;
+  lastMessage: string;
+  notificationCount: number
 }
 
 const fetchRecentChats = async (userId: string): Promise<RecentChat[]> => {
@@ -20,6 +23,18 @@ const useRecentChats = (userId: string) => {
     queryFn: () => fetchRecentChats(userId),
     enabled: !!userId,
   });
+
+  useEffect(() => {
+    const handleNewNotification = (contactId: string) => {
+      if (contactId === userId) {
+        refetch();
+      }
+    };
+    socket?.on("newNotification", handleNewNotification);
+    return () => {
+      socket?.off("newNotification", handleNewNotification);
+    };
+  }, [socket]);
 
   return {
     isLoading,
