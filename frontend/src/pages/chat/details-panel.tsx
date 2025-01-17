@@ -60,6 +60,7 @@ const UserDetailsInfo: React.FC = ({
               type: 'success',
               duration: 3000,
             });
+            setDetailsInfo(user);
             setIsEditing(false);
             localStorage.setItem(LS_USER, JSON.stringify(user));
           },

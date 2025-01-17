@@ -7,11 +7,11 @@ A full-stack real-time chat application built with modern web development techno
 
 - Real-time messaging
 
-- Dark and light themes
-
 - User authentication and management
 
 - Responsive design
+
+- Chat notifications
 
 ## 🔄 Installation and Execution
 
