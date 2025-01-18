@@ -53,12 +53,12 @@ export const UserCard: React.FC<UserCardProps> = ({ user, lastUpdated, lastMessa
           />
         </Float>
       </Avatar>
-      <Box flex="1">
+      <Box flex="1" maxWidth="calc(100% - 110px)">
         <Text fontSize="sm" fontWeight="bold" truncate>
           {user?.name}
         </Text>
         {lastMessage ? (
-          <Text fontSize="xs" color="gray.500" truncate>
+          <Text fontSize="xs" color="gray.500" truncate >
             {lastMessage}
           </Text>
         ) : null}
