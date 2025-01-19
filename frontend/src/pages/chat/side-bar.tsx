@@ -17,6 +17,7 @@ import {
   AccordionItemTrigger,
   AccordionItemContent,
 } from "@/components/ui/accordion";
+import { ChatGroups } from "./chat-groups";
 
 export const Sidebar = () => {
   const { setDetailsInfo, setSelectedUser } = useChat();
@@ -76,13 +77,21 @@ export const Sidebar = () => {
           <MdOutlineModeEdit />
         </IconButton>
       </HStack>
-      <AccordionRoot multiple defaultValue={["recent-chats", "contacts"]} p={1}>
+      <AccordionRoot multiple defaultValue={["recent-chats", "groups", "contacts"]} p={1}>
         <AccordionItem value="recent-chats">
           <AccordionItemTrigger>
             <span>Recent Chats</span>
           </AccordionItemTrigger>
-          <AccordionItemContent maxH="40vh" overflowY="auto" >
+          <AccordionItemContent maxH="35vh" overflowY="auto" >
             <RecentChats />
+          </AccordionItemContent>
+        </AccordionItem>
+        <AccordionItem value="groups">
+          <AccordionItemTrigger>
+            <span>Groups</span>
+          </AccordionItemTrigger>
+          <AccordionItemContent maxH="35vh" overflowY="auto" >
+            <ChatGroups />
           </AccordionItemContent>
         </AccordionItem>
 
@@ -90,7 +99,7 @@ export const Sidebar = () => {
           <AccordionItemTrigger overflowY="auto" >
             <span>Contacts</span>
           </AccordionItemTrigger>
-          <AccordionItemContent overflowY="auto" h="38vh" p={0}>
+          <AccordionItemContent overflowY="auto" h="30vh" p={0}>
             <ContactsList />
           </AccordionItemContent>
         </AccordionItem>
