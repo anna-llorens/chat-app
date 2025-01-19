@@ -7,7 +7,9 @@ import { Box, HStack, VStack, Input, Button, Text, Float, Circle, useMediaQuery,
 import { useEffect, useRef, useState } from "react";
 import { formatMessageDate, generateChatId } from "@/helpers"
 
-import { FiSearch, FiStar } from "react-icons/fi"
+import { FiSearch } from "react-icons/fi"
+import { TiPinOutline, TiPin } from "react-icons/ti";
+
 import { IoIosArrowBack } from "react-icons/io";
 import useOnlineStatus from "@/hooks/chat/use-online-status";
 import React from "react";
@@ -23,6 +25,7 @@ export const ChatArea = () => {
   const isOnline = onlineUsers.includes(String(selectedUser?.id));
   const chatId = generateChatId(selectedUser?.id, authUser?.id);
   const { refetchRecentChats } = useRecentChats(authUser?.id);
+  const [isPinned, setIspinned] = useState(false)
   const [isSmallScreen] = useMediaQuery(['(max-width: 768px)'], { ssr: false });
 
 
@@ -102,8 +105,8 @@ export const ChatArea = () => {
         </Text>
       </HStack>
       <HStack spaceX={2}>
-        <FiSearch size="24px" />
-        <FiStar size="24px" />
+        <FiSearch size="18px" />
+        {isPinned ? <TiPin size="24px" onClick={() => setIspinned(!isPinned)} color="red" /> : <TiPinOutline size="24px" color="red" onClick={() => setIspinned(!isPinned)} />}
       </HStack>
     </HStack>
 
